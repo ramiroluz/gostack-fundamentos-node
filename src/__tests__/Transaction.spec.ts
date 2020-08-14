@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { isUuid } from 'uuidv4';
+import { validate } from 'uuid';
 import app from '../app';
 
 describe('Transaction', () => {
@@ -10,7 +10,7 @@ describe('Transaction', () => {
       value: 1200,
     });
 
-    expect(isUuid(response.body.id)).toBe(true);
+    expect(validate(response.body.id)).toBe(true);
 
     expect(response.body).toMatchObject({
       title: 'Loan',
@@ -33,7 +33,7 @@ describe('Transaction', () => {
     });
 
     const response = await request(app).get('/transactions');
-
+   
     expect(response.body.transactions).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -62,6 +62,18 @@ describe('Transaction', () => {
       outcome: 1500,
       total: 2700,
     });
+  });
+
+  it('should have a transactions object in the list response.body', async () => {
+    const response = await request(app).get('/transactions');
+  
+    expect(response.body.hasOwnProperty('transactions')).toBeTruthy();
+  });
+
+  it('should have a balance object in the list response.body', async () => {
+    const response = await request(app).get('/transactions');
+  
+    expect(response.body.hasOwnProperty('balance')).toBeTruthy();
   });
 
   it('should not be able to create outcome transaction without a valid balance', async () => {
